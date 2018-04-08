@@ -4,7 +4,7 @@ module.exports = {
   async index (req, res) {
     try {
       const clients = await Client.findAll({
-        limit: 10
+        limit: 100
       })
       res.send(clients)
     } catch (err) {
@@ -20,6 +20,36 @@ module.exports = {
     } catch (err) {
       res.status(400).send({
         error: 'this email has already been used'
+      })
+    }
+  },
+  async get (req, res) {
+    try {
+      const client = await Client.findById(req.params.clientId)
+      if (!client) {
+        res.send({
+          error: 'client could not be found'
+        })
+      } else {
+        res.send(client)
+      }
+    } catch (err) {
+      res.status(400).send({
+        error: 'a problem occured'
+      })
+    }
+  },
+  async put (req, res) {
+    try {
+      await Client.update(req.body, {
+        where: {
+          id: req.params.clientId
+        }
+      })
+      res.send(req.body)
+    } catch (err) {
+      res.status(500).send({
+        error: 'an error has occured trying to update the client'
       })
     }
   }

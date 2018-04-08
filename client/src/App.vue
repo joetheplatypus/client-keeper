@@ -1,12 +1,43 @@
 <template>
   <div id="app">
-    <router-view/>
+    <v-app>
+      <v-toolbar flat dark class="orange">
+        <v-toolbar-side-icon></v-toolbar-side-icon>
+        <v-toolbar-title>Client Keeper</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-toolbar-items class="hidden-sm-and-down">
+          <v-btn flat :to="{ name: 'clients' }">Clients</v-btn>
+        </v-toolbar-items>
+      </v-toolbar>
+      <v-content>
+        <v-container fluid>
+          <router-view></router-view>
+          <v-snackbar :timeout="4000" v-model="snackbar">
+            {{snackcontent}}
+            <v-btn flat color="pink" @click.native="snackbar = false">Close</v-btn>
+          </v-snackbar>
+        </v-container>
+      </v-content>
+      <v-footer app></v-footer>
+    </v-app>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  data () {
+    return {
+      snackbar: false,
+      snackcontent: ''
+    }
+  },
+  methods: {
+    snack (str) {
+      this.snackcontent = str
+      this.snackbar = true
+    }
+  }
 }
 </script>
 
@@ -17,6 +48,5 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
