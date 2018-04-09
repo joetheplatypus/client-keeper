@@ -7,6 +7,7 @@
         <v-spacer></v-spacer>
         <v-toolbar-items class="hidden-sm-and-down">
           <v-btn flat :to="{ name: 'clients' }">Clients</v-btn>
+          <v-btn flat :to="{ name: 'dropins' }">Drop Ins</v-btn>
         </v-toolbar-items>
       </v-toolbar>
       <v-content>

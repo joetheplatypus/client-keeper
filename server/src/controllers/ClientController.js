@@ -62,15 +62,23 @@ module.exports = {
           email: req.body.email
         }
       })
-      if (!otherWithEmail) {
+      if (otherWithEmail.length > 0) {
+        if (otherWithEmail[0].id === parseInt(req.params.clientId)) {
+          await Client.update(req.body, {
+            where: {
+              id: req.params.clientId
+            }
+          })
+        } else {
+          res.status(400).send({
+            error: 'this email has already been used'
+          })
+        }
+      } else {
         await Client.update(req.body, {
           where: {
             id: req.params.clientId
           }
-        })
-      } else {
-        res.status(400).send({
-          error: 'this email has already been used'
         })
       }
       res.send(req.body)

@@ -39,6 +39,8 @@ export default {
             clientId: this.$route.params.clientId
           }
         })
+        const snackfunc = this.$parent.$parent.$parent.snack
+        snackfunc(`User ${this.client.name} updated`)
       } catch (err) {
         this.error = err.response.data.error
       }
