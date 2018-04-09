@@ -1,4 +1,4 @@
-const {Client} = require('../models')
+const {Dropin, Client} = require('../models')
 
 module.exports = {
   async index (req, res) {
@@ -19,7 +19,8 @@ module.exports = {
         })
       } else {
         clients = await Client.findAll({
-          limit: 100
+          limit: 100,
+          order: [['name']]
         })
       }
       res.send(clients)
@@ -87,6 +88,35 @@ module.exports = {
     } catch (err) {
       res.status(500).send({
         error: 'this an error has occured trying to update the client. This name may already have been used'
+      })
+    }
+  },
+  async getDropins (req, res) {
+    try {
+      const client = await Client.findById(req.params.clientId)
+      if (!client) {
+        res.send({
+          error: 'client could not be found'
+        })
+      } else {
+        const attendedDropins = []
+        const id = parseInt(req.params.clientId)
+        const dropins = await Dropin.findAll({
+          limit: 100,
+          order: [['date', 'DESC']]
+        })
+        for (var i = 0; i < dropins.length; i++) {
+          for (var j = 0; j < dropins[i].attendees.length; j++) {
+            if (dropins[i].attendees[j] === id) {
+              attendedDropins.push(dropins[i])
+            }
+          }
+        }
+        res.send(attendedDropins)
+      }
+    } catch (err) {
+      res.status(400).send({
+        error: 'a problem occured'
       })
     }
   }

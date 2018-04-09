@@ -5,10 +5,16 @@ import Clients from '@/components/Clients'
 import CreateClient from '@/components/CreateClient'
 import ViewClient from '@/components/ViewClient'
 import EditClient from '@/components/EditClient'
+
 import CreateDropin from '@/components/CreateDropin'
 import Dropins from '@/components/Dropins'
 import ViewDropin from '@/components/ViewDropin'
 import EditDropin from '@/components/EditDropin'
+
+import CreateCounsellingSession from '@/components/CreateCounsellingSession'
+import CounsellingSessions from '@/components/CounsellingSessions'
+import ViewCounsellingSession from '@/components/ViewCounsellingSession'
+import EditCounsellingSession from '@/components/EditCounsellingSession'
 
 Vue.use(Router)
 
@@ -58,6 +64,26 @@ export default new Router({
       path: '/dropins/:dropinId/edit',
       name: 'dropins-edit',
       component: EditDropin
+    },
+    {
+      path: '/counselling/create',
+      name: 'counselling-session-create',
+      component: CreateCounsellingSession
+    },
+    {
+      path: '/counselling',
+      name: 'counselling-sessions',
+      component: CounsellingSessions
+    },
+    {
+      path: '/counselling/:sessionId',
+      name: 'counselling-session',
+      component: ViewCounsellingSession
+    },
+    {
+      path: '/counselling/:sessionId/edit',
+      name: 'counselling-session-edit',
+      component: EditCounsellingSession
     }
   ]
 })

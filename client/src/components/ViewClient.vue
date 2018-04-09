@@ -17,6 +17,12 @@
           <h1>{{client.name}}</h1>
           <v-subheader>Email</v-subheader>
           <p>{{client.email}}</p>
+          <v-subheader>Attended Dropins</v-subheader>
+          <v-data-table hide-headers :items=client.attendedDropins>
+            <template slot="items" slot-scope="props">
+              <td>{{ props.item.date }}</td>
+            </template>
+          </v-data-table>
         </div>
       </div>
     </v-flex>
@@ -25,13 +31,15 @@
 
 <script>
 import ClientService from '@/services/ClientService'
+import dateformat from 'dateformat'
 
 export default {
   data () {
     return {
       client: {
         name: '',
-        email: ''
+        email: '',
+        attendedDropins: []
       },
       error: ''
     }
@@ -48,16 +56,26 @@ export default {
   methods: {
     load: async function () {
       const response = (await ClientService.show(this.$route.params.clientId)).data
+      const attendedDropins = (await ClientService.dropins(this.$route.params.clientId)).data
       if (response.error) {
         this.error = response.error
       } else {
         this.client = response
+        for (var i = 0; i < attendedDropins.length; i++) {
+          attendedDropins[i].date = this.dateParse(attendedDropins[i].date)
+        }
+        this.client.attendedDropins = attendedDropins
       }
     },
     clear: function () {
       this.client.name = ''
       this.client.email = ''
       this.error = ''
+    },
+    dateParse (date) {
+      var newDate = new Date(date)
+      newDate = dateformat(newDate, 'dddd, dS mmmm, yyyy')
+      return newDate
     }
   }
 }

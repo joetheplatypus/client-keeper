@@ -16,5 +16,8 @@ export default {
   },
   put (client) {
     return Api().put(`clients/${client.id}`, client)
+  },
+  dropins (clientId) {
+    return Api().get(`clients/${clientId}/dropins`)
   }
 }

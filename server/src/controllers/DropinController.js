@@ -13,7 +13,8 @@ module.exports = {
         })
       } else {
         dropins = await Dropin.findAll({
-          limit: 100
+          limit: 100,
+          order: [['date', 'DESC']]
         })
       }
       res.send(dropins)
