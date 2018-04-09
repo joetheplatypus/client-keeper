@@ -21,7 +21,7 @@
             <v-flex xs4 v-for="dropin in dropins" :key="dropin.id">
               <v-card>
                 <v-card-title primary-title class="justify-center"><h3 class="headline mb-0">{{dropin.date}}</h3></v-card-title>
-                <v-card-text>{{dropin.attendees}}</v-card-text>
+                <v-card-text>{{dropin.attendees.length}} attendees</v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <router-link class="no-decoration" :to="{ name: 'dropin', params: { dropinId: dropin.id }}">

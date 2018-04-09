@@ -33,7 +33,25 @@
               </v-date-picker>
             </v-menu>
           </v-flex>
-          <v-text-field label="attendees" required  v-model="dropin.attendees"></v-text-field>
+          <v-container fluid>
+            <v-layout row wrap>
+              <v-flex xs12 sm6>
+                <v-select
+                  :items="allClientsNames"
+                  v-model="addedClient"
+                  label="add client"
+                  autocomplete
+                ></v-select>
+                <v-btn @click="addClient(addedClient)">add</v-btn>
+              </v-flex>
+              <v-flex xs12 sm6>
+                <v-subheader>attendees</v-subheader>
+                <v-chip close v-for="client in clients" :key="client.id" @input="removeClient(client)">
+                  {{client.name}}
+                </v-chip>
+              </v-flex>
+            </v-layout>
+          </v-container>
           <div class="error" v-html="error" />
           <v-btn @click="save">Save</v-btn>
         </div>
@@ -44,6 +62,7 @@
 
 <script>
 import DropinService from '@/services/DropinService'
+import ClientService from '@/services/ClientService'
 import dateformat from 'dateformat'
 
 export default {
@@ -51,15 +70,23 @@ export default {
     return {
       dropin: {
         date: '',
-        attendees: ''
+        attendees: []
       },
-      error: null,
+      allClients: [],
+      allClientsNames: [],
+      clients: [],
+      addedClient: '',
       menu: false,
-      modal: false
+      modal: false,
+      error: null
     }
   },
   methods: {
     async save () {
+      this.dropin.attendees = []
+      for (var i = 0; i < this.clients.length; i++) {
+        this.dropin.attendees.push(this.clients[i].id)
+      }
       try {
         await DropinService.put(this.dropin)
         this.$router.push({
@@ -81,15 +108,53 @@ export default {
       } else {
         response.date = this.dateParse(response.date)
         this.dropin = response
+        for (var i = 0; i < this.dropin.attendees.length; i++) {
+          const client = (await ClientService.show(this.dropin.attendees[i])).data
+          this.clients.push(client)
+        }
       }
     },
     dateParse (date) {
       var newDate = new Date(date)
       newDate = dateformat(newDate, 'yyyy-mm-dd')
       return newDate
+    },
+    addClient (clientName) {
+      const client = {
+        id: this.clientNameToId(clientName),
+        name: clientName
+      }
+      if (!this.inClientList(client)) {
+        this.clients.push(client)
+      }
+    },
+    removeClient (client) {
+      var index = this.clients.indexOf(client)
+      if (index > -1) {
+        this.clients.splice(index, 1)
+      }
+    },
+    clientNameToId (name) {
+      for (var i = 0; i < this.allClients.length; i++) {
+        if (this.allClients[i].name === name) {
+          return this.allClients[i].id
+        }
+      }
+    },
+    inClientList (client) {
+      for (var i = 0; i < this.clients.length; i++) {
+        if (client.name === this.clients[i].name && client.id === this.clients[i].id) {
+          return true
+        }
+      }
+      return false
     }
   },
   async mounted () {
+    this.allClients = (await ClientService.index()).data
+    for (var i = 0; i < this.allClients.length; i++) {
+      this.allClientsNames.push(this.allClients[i].name)
+    }
     this.load()
   }
 }

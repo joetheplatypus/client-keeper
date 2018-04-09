@@ -35,7 +35,7 @@ module.exports = {
       res.send(client)
     } catch (err) {
       res.status(400).send({
-        error: 'this email has already been used'
+        error: 'this name/email has already been used'
       })
     }
   },
@@ -57,13 +57,15 @@ module.exports = {
   },
   async put (req, res) {
     try {
-      const otherWithEmail = await Client.findAll({
+      const otherWithData = await Client.findAll({
         where: {
-          email: req.body.email
+          $or: [
+            {email: req.body.email}
+          ]
         }
       })
-      if (otherWithEmail.length > 0) {
-        if (otherWithEmail[0].id === parseInt(req.params.clientId)) {
+      if (otherWithData.length > 0) {
+        if (otherWithData[0].id === parseInt(req.params.clientId)) {
           await Client.update(req.body, {
             where: {
               id: req.params.clientId
@@ -84,7 +86,7 @@ module.exports = {
       res.send(req.body)
     } catch (err) {
       res.status(500).send({
-        error: 'an error has occured trying to update the client'
+        error: 'this an error has occured trying to update the client. This name may already have been used'
       })
     }
   }

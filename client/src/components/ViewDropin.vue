@@ -16,7 +16,11 @@
           <v-subheader>Date</v-subheader>
           <h1>{{dropin.date}}</h1>
           <v-subheader>attendees</v-subheader>
-          <p>{{dropin.attendees}}</p>
+          <v-data-table hide-headers hide-actions :items=dropin.attendeeObjs>
+            <template slot="items" slot-scope="props">
+              <td>{{ props.item.name }}</td>
+            </template>
+          </v-data-table>
         </div>
       </div>
     </v-flex>
@@ -25,6 +29,7 @@
 
 <script>
 import DropinService from '@/services/DropinService'
+import ClientService from '@/services/ClientService'
 import dateformat from 'dateformat'
 
 export default {
@@ -32,7 +37,8 @@ export default {
     return {
       dropin: {
         date: '',
-        attendees: ''
+        attendees: [],
+        attendeeObjs: []
       },
       error: ''
     }
@@ -58,6 +64,11 @@ export default {
         this.error = data.error
       } else {
         data.date = this.dateParse(data.date)
+        data.attendeeObjs = []
+        for (var i = 0; i < data.attendees.length; i++) {
+          const client = (await ClientService.show(data.attendees[i])).data
+          data.attendeeObjs.push(client)
+        }
         this.dropin = data
       }
     },
