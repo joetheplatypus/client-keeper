@@ -10,6 +10,14 @@
             </router-link>
           </v-card>
           <v-layout row wrap>
+            <v-flex xs1 offset-xs1>
+              <v-container>
+                 <v-icon>search</v-icon>
+              </v-container>
+            </v-flex>
+            <v-flex xs8>
+              <v-text-field name="search" label="Search" v-model="search"></v-text-field>
+            </v-flex>
             <v-flex xs4 v-for="client in clients" :key="client.id">
               <v-card>
                 <v-card-title primary-title class="justify-center"><h3 class="headline mb-0">{{client.name}}</h3></v-card-title>
@@ -36,11 +44,29 @@ import ClientService from '@/services/ClientService'
 export default {
   data () {
     return {
-      clients: null
+      clients: null,
+      search: ''
     }
   },
-  async mounted () {
-    this.clients = (await ClientService.index()).data
+  watch: {
+    search (value) {
+      const route = {
+        name: 'clients'
+      }
+      if (this.search !== '') {
+        route.query = {
+          search: this.search
+        }
+      }
+      this.$router.push(route)
+    },
+    '$route.query.search': {
+      immediate: true,
+      async handler (value) {
+        this.search = value
+        this.clients = (await ClientService.index(value)).data
+      }
+    }
   }
 }
 

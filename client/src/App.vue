@@ -12,7 +12,7 @@
       <v-content>
         <v-container fluid>
           <router-view></router-view>
-          <v-snackbar :timeout="4000" v-model="snackbar">
+          <v-snackbar top :timeout="4000" v-model="snackbar">
             {{snackcontent}}
             <v-btn flat color="pink" @click.native="snackbar = false">Close</v-btn>
           </v-snackbar>

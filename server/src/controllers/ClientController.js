@@ -3,9 +3,25 @@ const {Client} = require('../models')
 module.exports = {
   async index (req, res) {
     try {
-      const clients = await Client.findAll({
-        limit: 100
-      })
+      let clients = null
+      const search = req.query.search
+      if (search) {
+        clients = await Client.findAll({
+          where: {
+            $or: [
+              'email', 'name'
+            ].map(key => ({
+              [key]: {
+                $like: `%${search}%`
+              }
+            }))
+          }
+        })
+      } else {
+        clients = await Client.findAll({
+          limit: 100
+        })
+      }
       res.send(clients)
     } catch (err) {
       res.status(500).send({
@@ -41,11 +57,22 @@ module.exports = {
   },
   async put (req, res) {
     try {
-      await Client.update(req.body, {
+      const otherWithEmail = await Client.findAll({
         where: {
-          id: req.params.clientId
+          email: req.body.email
         }
       })
+      if (!otherWithEmail) {
+        await Client.update(req.body, {
+          where: {
+            id: req.params.clientId
+          }
+        })
+      } else {
+        res.status(400).send({
+          error: 'this email has already been used'
+        })
+      }
       res.send(req.body)
     } catch (err) {
       res.status(500).send({

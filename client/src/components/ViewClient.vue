@@ -7,12 +7,16 @@
         </v-toolbar>
 
         <div class="pl-4 pr-4 pt-2 pb-2">
+            <v-card>
+              <router-link :to="{ name: 'clients-edit', params: { clientId: this.$route.params.clientId }}">
+                <v-btn absolute top right fab><v-icon>edit</v-icon></v-btn>
+              </router-link>
+            </v-card>
           <div class="error">{{error}}</div>
           <v-subheader>Name</v-subheader>
           <h1>{{client.name}}</h1>
           <v-subheader>Email</v-subheader>
           <p>{{client.email}}</p>
-          <v-btn>Edit</v-btn>
         </div>
       </div>
     </v-flex>
