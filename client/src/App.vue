@@ -9,6 +9,7 @@
           <v-btn flat :to="{ name: 'clients' }">Clients</v-btn>
           <v-btn flat :to="{ name: 'dropins' }">Drop Ins</v-btn>
           <v-btn flat :to="{ name: 'counselling-sessions' }">Counselling</v-btn>
+          <v-btn flat :to="{ name: 'interactions' }">Other Interactions</v-btn>
         </v-toolbar-items>
       </v-toolbar>
       <v-content>

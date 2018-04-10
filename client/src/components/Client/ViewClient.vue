@@ -23,6 +23,12 @@
               <td>{{ props.item.date }}</td>
             </template>
           </v-data-table>
+          <v-subheader>Counselling Sessions</v-subheader>
+          <v-data-table hide-headers :items=client.attendedCounsellingSessions>
+            <template slot="items" slot-scope="props">
+              <td>{{ props.item.date }}</td>
+            </template>
+          </v-data-table>
         </div>
       </div>
     </v-flex>
@@ -39,7 +45,8 @@ export default {
       client: {
         name: '',
         email: '',
-        attendedDropins: []
+        attendedDropins: [],
+        attendedCounsellingSessions: []
       },
       error: ''
     }
@@ -57,6 +64,7 @@ export default {
     load: async function () {
       const response = (await ClientService.show(this.$route.params.clientId)).data
       const attendedDropins = (await ClientService.dropins(this.$route.params.clientId)).data
+      const counsellingSessions = (await ClientService.counselling(this.$route.params.clientId)).data
       if (response.error) {
         this.error = response.error
       } else {
@@ -64,7 +72,11 @@ export default {
         for (var i = 0; i < attendedDropins.length; i++) {
           attendedDropins[i].date = this.dateParse(attendedDropins[i].date)
         }
+        for (var j = 0; j < counsellingSessions.length; j++) {
+          counsellingSessions[j].date = this.dateParse(counsellingSessions[j].date)
+        }
         this.client.attendedDropins = attendedDropins
+        this.client.attendedCounsellingSessions = counsellingSessions
       }
     },
     clear: function () {

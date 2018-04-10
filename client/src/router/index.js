@@ -1,20 +1,25 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
-import Clients from '@/components/Clients'
-import CreateClient from '@/components/CreateClient'
-import ViewClient from '@/components/ViewClient'
-import EditClient from '@/components/EditClient'
+import Clients from '@/components/Client/Clients'
+import CreateClient from '@/components/Client/CreateClient'
+import ViewClient from '@/components/Client/ViewClient'
+import EditClient from '@/components/Client/EditClient'
 
-import CreateDropin from '@/components/CreateDropin'
-import Dropins from '@/components/Dropins'
-import ViewDropin from '@/components/ViewDropin'
-import EditDropin from '@/components/EditDropin'
+import CreateDropin from '@/components/Dropin/CreateDropin'
+import Dropins from '@/components/Dropin/Dropins'
+import ViewDropin from '@/components/Dropin/ViewDropin'
+import EditDropin from '@/components/Dropin/EditDropin'
 
-import CreateCounsellingSession from '@/components/CreateCounsellingSession'
-import CounsellingSessions from '@/components/CounsellingSessions'
-import ViewCounsellingSession from '@/components/ViewCounsellingSession'
-import EditCounsellingSession from '@/components/EditCounsellingSession'
+import CreateCounsellingSession from '@/components/Counselling/CreateCounsellingSession'
+import CounsellingSessions from '@/components/Counselling/CounsellingSessions'
+import ViewCounsellingSession from '@/components/Counselling/ViewCounsellingSession'
+import EditCounsellingSession from '@/components/Counselling/EditCounsellingSession'
+
+import CreateInteraction from '@/components/Interaction/CreateInteraction'
+import EditInteraction from '@/components/Interaction/EditInteraction'
+import Interactions from '@/components/Interaction/Interactions'
+import ViewInteraction from '@/components/Interaction/ViewInteraction'
 
 Vue.use(Router)
 
@@ -84,6 +89,26 @@ export default new Router({
       path: '/counselling/:sessionId/edit',
       name: 'counselling-session-edit',
       component: EditCounsellingSession
+    },
+    {
+      path: '/interactions/create',
+      name: 'interaction-create',
+      component: CreateInteraction
+    },
+    {
+      path: '/interactions',
+      name: 'interactions',
+      component: Interactions
+    },
+    {
+      path: '/interactions/:interactionId',
+      name: 'interaction',
+      component: ViewInteraction
+    },
+    {
+      path: '/interactions/:interactionId/edit',
+      name: 'interaction-edit',
+      component: EditInteraction
     }
   ]
 })

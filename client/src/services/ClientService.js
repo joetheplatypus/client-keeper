@@ -19,5 +19,8 @@ export default {
   },
   dropins (clientId) {
     return Api().get(`clients/${clientId}/dropins`)
+  },
+  counselling (clientId) {
+    return Api().get(`clients/${clientId}/counselling`)
   }
 }
