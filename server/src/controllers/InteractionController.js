@@ -83,5 +83,21 @@ module.exports = {
         error: 'an error has occured trying to update the interaction'
       })
     }
+  },
+  async delete (req, res) {
+    try {
+      Interaction.destroy({
+        where: {
+          id: req.params.interactionId
+        }
+      })
+      res.status(200).send({
+        message: 'interaction deleted successfully'
+      })
+    } catch (err) {
+      res.status(400).send({
+        error: 'could not delete interaction'
+      })
+    }
   }
 }

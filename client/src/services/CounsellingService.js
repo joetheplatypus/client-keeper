@@ -16,5 +16,8 @@ export default {
   },
   put (session) {
     return Api().put(`counselling/${session.id}`, session)
+  },
+  delete (sessionId) {
+    return Api().delete(`counselling/${sessionId}`)
   }
 }

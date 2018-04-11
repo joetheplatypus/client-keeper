@@ -6,33 +6,55 @@
           <v-toolbar-title>Edit an existing dropin</v-toolbar-title>
         </v-toolbar>
         <div class="pl-4 pr-4 pt-2 pb-2">
-          <v-flex xs11 sm5>
-            <v-menu
-              ref="menu"
-              lazy
-              :close-on-content-click="false"
-              v-model="menu"
-              transition="scale-transition"
-              offset-y
-              full-width
-              :nudge-right="40"
-              min-width="290px"
-              :return-value.sync="dropin.date"
-            >
-              <v-text-field
-                slot="activator"
-                label="Date"
-                v-model="dropin.date"
-                prepend-icon="event"
-                readonly
-              ></v-text-field>
-              <v-date-picker v-model="dropin.date" no-title scrollable>
-                <v-spacer></v-spacer>
-                <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
-                <v-btn flat color="primary" @click="$refs.menu.save(dropin.date)">OK</v-btn>
-              </v-date-picker>
-            </v-menu>
-          </v-flex>
+          <v-card>
+            <v-btn absolute top right fab @click="checkDelete = true"><v-icon>delete</v-icon></v-btn>
+             <v-dialog v-model="checkDelete" max-width="290">
+              <v-card>
+                <v-card-title class="headline">Are you sure you want to delete this dropin?</v-card-title>
+                <v-card-text>{{dropin.date}}</v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="grey darken-1" flat="flat" @click.native="checkDelete = false">Cancel</v-btn>
+                  <v-btn color="red darken-1" flat="flat" @click.native="deleteThis()">Delete</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </v-card>
+          <v-layout row wrap>
+            <v-flex xs11 sm5>
+              <v-menu
+                ref="menu"
+                lazy
+                :close-on-content-click="false"
+                v-model="menu"
+                transition="scale-transition"
+                offset-y
+                full-width
+                :nudge-right="40"
+                min-width="290px"
+                :return-value.sync="dropin.date"
+              >
+                <v-text-field
+                  slot="activator"
+                  label="Date"
+                  v-model="dropin.date"
+                  prepend-icon="event"
+                  readonly
+                ></v-text-field>
+                <v-date-picker v-model="dropin.date" no-title scrollable :allowed-dates="allowedDates">
+                  <v-spacer></v-spacer>
+                  <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
+                  <v-btn flat color="primary" @click="$refs.menu.save(dropin.date)">OK</v-btn>
+                </v-date-picker>
+              </v-menu>
+            </v-flex>
+            <v-spacer />
+            <v-flex xs2>
+              <v-container>
+                <v-checkbox v-model="dropin.choir" label="choir"></v-checkbox>
+              </v-container>
+            </v-flex>
+          </v-layout>
           <v-container fluid>
             <v-layout row wrap>
               <v-flex xs12 sm6>
@@ -78,7 +100,8 @@ export default {
       addedClient: '',
       menu: false,
       modal: false,
-      error: null
+      error: null,
+      checkDelete: false
     }
   },
   methods: {
@@ -86,6 +109,12 @@ export default {
       this.dropin.attendees = []
       for (var i = 0; i < this.clients.length; i++) {
         this.dropin.attendees.push(this.clients[i].id)
+      }
+      this.dropin.date = this.dropin.date.substr(0, 10)
+      if (this.dropin.choir) {
+        this.dropin.date = this.dropin.date + 'T12:00:00.000Z'
+      } else {
+        this.dropin.date = this.dropin.date + 'T00:00:00.000Z'
       }
       try {
         await DropinService.put(this.dropin)
@@ -98,6 +127,7 @@ export default {
         const snackfunc = this.$parent.$parent.$parent.snack
         snackfunc('dropin updated')
       } catch (err) {
+        this.dropin.date = this.dropin.date.substr(0, 10)
         this.error = err.response.data.error
       }
     },
@@ -148,6 +178,20 @@ export default {
         }
       }
       return false
+    },
+    allowedDates: val => (new Date() >= new Date(val)) && (new Date(val).getDay() === 0 || new Date(val).getDay() === 1 || new Date(val).getDay() === 2 || new Date(val).getDay() === 4 || new Date(val).getDay() === 5),
+    async deleteThis () {
+      const response = (await DropinService.delete(this.$route.params.dropinId)).data
+      this.checkDelete = false
+      if (response.error) {
+        this.error = response.error
+      } else {
+        const snackfunc = this.$parent.$parent.$parent.snack
+        snackfunc(`dropin ${this.dropin.date} deleted`)
+        this.$router.push({
+          name: 'dropins'
+        })
+      }
     }
   },
   async mounted () {

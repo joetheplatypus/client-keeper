@@ -20,13 +20,19 @@
           <v-subheader>Attended Dropins</v-subheader>
           <v-data-table hide-headers :items=client.attendedDropins>
             <template slot="items" slot-scope="props">
-              <td>{{ props.item.date }}</td>
+              <td><i v-if="props.item.choir">Choir - </i>{{ props.item.date }}</td>
             </template>
           </v-data-table>
           <v-subheader>Counselling Sessions</v-subheader>
           <v-data-table hide-headers :items=client.attendedCounsellingSessions>
             <template slot="items" slot-scope="props">
               <td>{{ props.item.date }}</td>
+            </template>
+          </v-data-table>
+          <v-subheader>Other Interactions</v-subheader>
+          <v-data-table hide-headers :items=client.attendedInteractions>
+            <template slot="items" slot-scope="props">
+              <td>{{ props.item.date }} - <i>{{ props.item.notes }}</i></td>
             </template>
           </v-data-table>
         </div>
@@ -46,7 +52,8 @@ export default {
         name: '',
         email: '',
         attendedDropins: [],
-        attendedCounsellingSessions: []
+        attendedCounsellingSessions: [],
+        attendedInteractions: []
       },
       error: ''
     }
@@ -65,6 +72,7 @@ export default {
       const response = (await ClientService.show(this.$route.params.clientId)).data
       const attendedDropins = (await ClientService.dropins(this.$route.params.clientId)).data
       const counsellingSessions = (await ClientService.counselling(this.$route.params.clientId)).data
+      const attendedInteractions = (await ClientService.interactions(this.$route.params.clientId)).data
       if (response.error) {
         this.error = response.error
       } else {
@@ -75,8 +83,12 @@ export default {
         for (var j = 0; j < counsellingSessions.length; j++) {
           counsellingSessions[j].date = this.dateParse(counsellingSessions[j].date)
         }
+        for (var k = 0; k < attendedInteractions.length; k++) {
+          attendedInteractions[k].date = this.dateParse(attendedInteractions[k].date)
+        }
         this.client.attendedDropins = attendedDropins
         this.client.attendedCounsellingSessions = counsellingSessions
+        this.client.attendedInteractions = attendedInteractions
       }
     },
     clear: function () {

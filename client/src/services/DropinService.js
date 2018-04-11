@@ -16,5 +16,8 @@ export default {
   },
   put (dropin) {
     return Api().put(`dropins/${dropin.id}`, dropin)
+  },
+  delete (dropinId) {
+    return Api().delete(`dropins/${dropinId}`)
   }
 }

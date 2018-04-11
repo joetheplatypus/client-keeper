@@ -26,7 +26,7 @@
                 prepend-icon="event"
                 readonly
               ></v-text-field>
-              <v-date-picker v-model="session.date" no-title scrollable>
+              <v-date-picker v-model="session.date" no-title scrollable :allowed-dates="allowedDates">
                 <v-spacer></v-spacer>
                 <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
                 <v-btn flat color="primary" @click="$refs.menu.save(session.date)">OK</v-btn>
@@ -132,7 +132,8 @@ export default {
         }
       }
       return false
-    }
+    },
+    allowedDates: val => (new Date() >= new Date(val))
   },
   async mounted () {
     this.allClients = (await ClientService.index()).data

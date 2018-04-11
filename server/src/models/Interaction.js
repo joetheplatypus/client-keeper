@@ -1,9 +1,6 @@
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define('Interaction', {
-    date: {
-      type: DataTypes.DATE,
-      unique: true
-    },
+    date: DataTypes.DATE,
     attendees: DataTypes.JSON,
     notes: DataTypes.TEXT
   })

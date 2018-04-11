@@ -1,4 +1,4 @@
-const {Counselling, Dropin, Client} = require('../models')
+const {Interaction, Counselling, Dropin, Client} = require('../models')
 
 module.exports = {
   async index (req, res) {
@@ -91,6 +91,22 @@ module.exports = {
       })
     }
   },
+  async delete (req, res) {
+    try {
+      Client.destroy({
+        where: {
+          id: req.params.clientId
+        }
+      })
+      res.status(200).send({
+        message: 'client deleted successfully'
+      })
+    } catch (err) {
+      res.status(400).send({
+        error: 'could not delete client'
+      })
+    }
+  },
   async getDropins (req, res) {
     try {
       const client = await Client.findById(req.params.clientId)
@@ -131,6 +147,35 @@ module.exports = {
         const attendedSessions = []
         const id = parseInt(req.params.clientId)
         const sessions = await Counselling.findAll({
+          limit: 100,
+          order: [['date', 'DESC']]
+        })
+        for (var i = 0; i < sessions.length; i++) {
+          for (var j = 0; j < sessions[i].attendees.length; j++) {
+            if (sessions[i].attendees[j] === id) {
+              attendedSessions.push(sessions[i])
+            }
+          }
+        }
+        res.send(attendedSessions)
+      }
+    } catch (err) {
+      res.status(400).send({
+        error: 'a problem occured'
+      })
+    }
+  },
+  async getInteractions (req, res) {
+    try {
+      const client = await Client.findById(req.params.clientId)
+      if (!client) {
+        res.send({
+          error: 'client could not be found'
+        })
+      } else {
+        const attendedSessions = []
+        const id = parseInt(req.params.clientId)
+        const sessions = await Interaction.findAll({
           limit: 100,
           order: [['date', 'DESC']]
         })

@@ -83,5 +83,21 @@ module.exports = {
         error: 'an error has occured trying to update the session'
       })
     }
+  },
+  async delete (req, res) {
+    try {
+      Counselling.destroy({
+        where: {
+          id: req.params.sessionId
+        }
+      })
+      res.status(200).send({
+        message: 'session deleted successfully'
+      })
+    } catch (err) {
+      res.status(400).send({
+        error: 'could not delete session'
+      })
+    }
   }
 }

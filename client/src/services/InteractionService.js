@@ -16,5 +16,8 @@ export default {
   },
   put (interaction) {
     return Api().put(`interactions/${interaction.id}`, interaction)
+  },
+  delete (interactionId) {
+    return Api().delete(`interactions/${interactionId}`)
   }
 }

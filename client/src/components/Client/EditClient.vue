@@ -6,6 +6,20 @@
           <v-toolbar-title>Edit an existing client</v-toolbar-title>
         </v-toolbar>
         <div class="pl-4 pr-4 pt-2 pb-2">
+          <v-card>
+            <v-btn absolute top right fab @click="checkDelete = true"><v-icon>delete</v-icon></v-btn>
+             <v-dialog v-model="checkDelete" max-width="290">
+              <v-card>
+                <v-card-title class="headline">Are you sure you want to delete this client?</v-card-title>
+                <v-card-text>{{client.name}}</v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="grey darken-1" flat="flat" @click.native="checkDelete = false">Cancel</v-btn>
+                  <v-btn color="red darken-1" flat="flat" @click.native="deleteThis()">Delete</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </v-card>
           <v-text-field label="Name" required  v-model="client.name"></v-text-field>
           <v-text-field label="Email" required  v-model="client.email"></v-text-field>
           <div class="error" v-html="error" />
@@ -26,7 +40,8 @@ export default {
         name: '',
         email: ''
       },
-      error: null
+      error: null,
+      checkDelete: false
     }
   },
   methods: {
@@ -51,6 +66,19 @@ export default {
         this.error = response.error
       } else {
         this.client = response
+      }
+    },
+    async deleteThis () {
+      const response = (await ClientService.delete(this.$route.params.clientId)).data
+      this.checkDelete = false
+      if (response.error) {
+        this.error = response.error
+      } else {
+        const snackfunc = this.$parent.$parent.$parent.snack
+        snackfunc(`User ${this.client.name} deleted`)
+        this.$router.push({
+          name: 'clients'
+        })
       }
     }
   },

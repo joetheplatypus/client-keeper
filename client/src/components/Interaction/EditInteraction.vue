@@ -6,6 +6,20 @@
           <v-toolbar-title>Edit an existing interaction</v-toolbar-title>
         </v-toolbar>
         <div class="pl-4 pr-4 pt-2 pb-2">
+          <v-card>
+            <v-btn absolute top right fab @click="checkDelete = true"><v-icon>delete</v-icon></v-btn>
+             <v-dialog v-model="checkDelete" max-width="290">
+              <v-card>
+                <v-card-title class="headline">Are you sure you want to delete this interaction?</v-card-title>
+                <v-card-text>{{session.date}}</v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="grey darken-1" flat="flat" @click.native="checkDelete = false">Cancel</v-btn>
+                  <v-btn color="red darken-1" flat="flat" @click.native="deleteThis()">Delete</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </v-card>
           <v-flex xs11 sm5>
             <v-menu
               ref="menu"
@@ -26,7 +40,7 @@
                 prepend-icon="event"
                 readonly
               ></v-text-field>
-              <v-date-picker v-model="session.date" no-title scrollable>
+              <v-date-picker v-model="session.date" no-title scrollable :allowed-dates="allowedDates">
                 <v-spacer></v-spacer>
                 <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
                 <v-btn flat color="primary" @click="$refs.menu.save(session.date)">OK</v-btn>
@@ -82,7 +96,8 @@ export default {
       addedClient: '',
       menu: false,
       modal: false,
-      error: null
+      error: null,
+      checkDelete: false
     }
   },
   methods: {
@@ -152,6 +167,20 @@ export default {
         }
       }
       return false
+    },
+    allowedDates: val => (new Date() >= new Date(val)),
+    async deleteThis () {
+      const response = (await InteractionService.delete(this.$route.params.interactionId)).data
+      this.checkDelete = false
+      if (response.error) {
+        this.error = response.error
+      } else {
+        const snackfunc = this.$parent.$parent.$parent.snack
+        snackfunc(`interaction ${this.session.date} deleted`)
+        this.$router.push({
+          name: 'interactions'
+        })
+      }
     }
   },
   async mounted () {

@@ -4,6 +4,7 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.DATE,
       unique: true
     },
-    attendees: DataTypes.JSON
+    attendees: DataTypes.JSON,
+    choir: DataTypes.BOOLEAN
   })
 }

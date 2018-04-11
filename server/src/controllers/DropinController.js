@@ -1,5 +1,5 @@
 const {Dropin} = require('../models')
-const dateFormat = require('dateformat')
+// const dateFormat = require('dateformat')
 
 module.exports = {
   async index (req, res) {
@@ -54,7 +54,7 @@ module.exports = {
     try {
       const otherdropins = await Dropin.findAll()
       for (var i = 0; i < otherdropins.length; i++) {
-        const date = dateFormat(otherdropins[i].date, 'yyyy-mm-dd')
+        const date = otherdropins[i].date
         if (date === req.body.date) {
           if (otherdropins[i].id === parseInt(req.params.dropinId)) {
             await Dropin.update(req.body, {
@@ -81,6 +81,22 @@ module.exports = {
     } catch (err) {
       res.status(500).send({
         error: 'an error has occured trying to update the dropin'
+      })
+    }
+  },
+  async delete (req, res) {
+    try {
+      Dropin.destroy({
+        where: {
+          id: req.params.dropinId
+        }
+      })
+      res.status(200).send({
+        message: 'dropin deleted successfully'
+      })
+    } catch (err) {
+      res.status(400).send({
+        error: 'could not delete dropin'
       })
     }
   }

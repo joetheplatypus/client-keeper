@@ -17,10 +17,16 @@ export default {
   put (client) {
     return Api().put(`clients/${client.id}`, client)
   },
+  delete (clientId) {
+    return Api().delete(`clients/${clientId}`)
+  },
   dropins (clientId) {
     return Api().get(`clients/${clientId}/dropins`)
   },
   counselling (clientId) {
     return Api().get(`clients/${clientId}/counselling`)
+  },
+  interactions (clientId) {
+    return Api().get(`clients/${clientId}/interactions`)
   }
 }
