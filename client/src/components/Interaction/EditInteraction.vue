@@ -143,7 +143,7 @@ export default {
         id: this.clientNameToId(clientName),
         name: clientName
       }
-      if (!this.inClientList(client)) {
+      if (!this.inClientList(client) && clientName !== '') {
         this.clients.push(client)
       }
     },

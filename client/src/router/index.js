@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
+
+import Analytics from '@/components/Analytics/Analytics'
+
 import Clients from '@/components/Client/Clients'
 import CreateClient from '@/components/Client/CreateClient'
 import ViewClient from '@/components/Client/ViewClient'
@@ -29,6 +32,11 @@ export default new Router({
       path: '/',
       name: 'HelloWorld',
       component: HelloWorld
+    },
+    {
+      path: '/analytics',
+      name: 'analytics',
+      component: Analytics
     },
     {
       path: '/clients',

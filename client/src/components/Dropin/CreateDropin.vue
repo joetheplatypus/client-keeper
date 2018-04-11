@@ -34,7 +34,6 @@
                 </v-date-picker>
               </v-menu>
             </v-flex>
-            <v-spacer />
             <v-flex xs2>
               <v-container>
                 <v-checkbox v-model="dropin.choir" label="choir"></v-checkbox>
@@ -120,7 +119,7 @@ export default {
         id: this.clientNameToId(clientName),
         name: clientName
       }
-      if (!this.inClientList(client)) {
+      if (!this.inClientList(client) && clientName !== '') {
         this.clients.push(client)
       }
     },
