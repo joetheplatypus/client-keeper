@@ -6,10 +6,12 @@
           <v-toolbar-title>Create a new client</v-toolbar-title>
         </v-toolbar>
         <div class="pl-4 pr-4 pt-2 pb-2">
-          <v-text-field label="Name" required  v-model="client.name"></v-text-field>
-          <v-text-field label="Email" required  v-model="client.email"></v-text-field>
-          <div class="error" v-html="error" />
-          <v-btn @click="create">Create</v-btn>
+          <v-form ref="form">
+            <v-text-field label="Name" required  v-model="client.name" :rules="nameRules" @keyup.enter.native="submit"></v-text-field>
+            <v-text-field label="Email" required  v-model="client.email" :rules="emailRules" @keyup.enter.native="submit"></v-text-field>
+            <div class="error" v-html="error" />
+            <v-btn @click="submit">Create</v-btn>
+          </v-form>
         </div>
       </div>
     </v-flex>
@@ -26,7 +28,14 @@ export default {
         name: '',
         email: ''
       },
-      error: null
+      error: null,
+      emailRules: [
+        v => !!v || 'E-mail is required',
+        v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
+      ],
+      nameRules: [
+        v => !!v || 'Name is required'
+      ]
     }
   },
   methods: {
@@ -41,6 +50,11 @@ export default {
         this.$router.push({name: 'clients'})
       } catch (err) {
         this.error = err.response.data.error
+      }
+    },
+    submit () {
+      if (this.$refs.form.validate()) {
+        this.create()
       }
     }
   }

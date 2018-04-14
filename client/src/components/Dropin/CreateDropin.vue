@@ -19,6 +19,7 @@
                 :nudge-right="40"
                 min-width="290px"
                 :return-value.sync="dropin.date"
+                required
               >
                 <v-text-field
                   slot="activator"
@@ -26,11 +27,9 @@
                   v-model="dropin.date"
                   prepend-icon="event"
                   readonly
+                  required
                 ></v-text-field>
-                <v-date-picker v-model="dropin.date" no-title scrollable :allowed-dates="allowedDates">
-                  <v-spacer></v-spacer>
-                  <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
-                  <v-btn flat color="primary" @click="$refs.menu.save(dropin.date)">OK</v-btn>
+                <v-date-picker v-model="dropin.date" no-title scrollable :allowed-dates="allowedDates" @change="$refs.menu.save(dropin.date)" required>
                 </v-date-picker>
               </v-menu>
             </v-flex>
@@ -47,6 +46,7 @@
                   :items="allClientsNames"
                   v-model="addedClient"
                   label="add client"
+                  @keyup.enter.native="addClient(addedClient)"
                   autocomplete
                 ></v-select>
                 <v-btn @click="addClient(addedClient)">add</v-btn>
@@ -60,7 +60,7 @@
             </v-layout>
           </v-container>
           <div class="error" v-html="error" />
-          <v-btn @click="create">Create</v-btn>
+          <v-btn @click="submit">Create</v-btn>
         </div>
       </div>
     </v-flex>
@@ -122,6 +122,7 @@ export default {
       if (!this.inClientList(client) && clientName !== '') {
         this.clients.push(client)
       }
+      this.addedClient = ''
     },
     removeClient (client) {
       var index = this.clients.indexOf(client)
@@ -144,7 +145,15 @@ export default {
       }
       return false
     },
-    allowedDates: val => (new Date() >= new Date(val)) && (new Date(val).getDay() === 0 || new Date(val).getDay() === 1 || new Date(val).getDay() === 2 || new Date(val).getDay() === 4 || new Date(val).getDay() === 5)
+    allowedDates: val => (new Date() >= new Date(val)) && (new Date(val).getDay() === 0 || new Date(val).getDay() === 1 || new Date(val).getDay() === 2 || new Date(val).getDay() === 4 || new Date(val).getDay() === 5),
+    submit () {
+      this.error = ''
+      if (this.dropin.date !== '') {
+        this.create()
+      } else {
+        this.error = 'dropin must have a date'
+      }
+    }
   },
   async mounted () {
     this.allClients = (await ClientService.index()).data

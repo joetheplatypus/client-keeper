@@ -20,10 +20,12 @@
               </v-card>
             </v-dialog>
           </v-card>
-          <v-text-field label="Name" required  v-model="client.name"></v-text-field>
-          <v-text-field label="Email" required  v-model="client.email"></v-text-field>
-          <div class="error" v-html="error" />
-          <v-btn @click="save">Save</v-btn>
+          <v-form ref="form">
+            <v-text-field label="Name" required  v-model="client.name" :rules="nameRules" @keyup.enter.native="submit"></v-text-field>
+            <v-text-field label="Email" required  v-model="client.email" :rules="emailRules" @keyup.enter.native="submit"></v-text-field>
+            <div class="error" v-html="error" />
+            <v-btn @click="submit">Save</v-btn>
+          </v-form>
         </div>
       </div>
     </v-flex>
@@ -41,7 +43,14 @@ export default {
         email: ''
       },
       error: null,
-      checkDelete: false
+      checkDelete: false,
+      emailRules: [
+        v => !!v || 'E-mail is required',
+        v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
+      ],
+      nameRules: [
+        v => !!v || 'Name is required'
+      ]
     }
   },
   methods: {
@@ -79,6 +88,11 @@ export default {
         this.$router.push({
           name: 'clients'
         })
+      }
+    },
+    submit () {
+      if (this.$refs.form.validate()) {
+        this.save()
       }
     }
   },

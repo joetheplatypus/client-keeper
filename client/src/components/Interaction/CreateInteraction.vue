@@ -18,6 +18,7 @@
               :nudge-right="40"
               min-width="290px"
               :return-value.sync="session.date"
+              required
             >
               <v-text-field
                 slot="activator"
@@ -25,11 +26,9 @@
                 v-model="session.date"
                 prepend-icon="event"
                 readonly
+                required
               ></v-text-field>
-              <v-date-picker v-model="session.date" no-title scrollable :allowed-dates="allowedDates">
-                <v-spacer></v-spacer>
-                <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
-                <v-btn flat color="primary" @click="$refs.menu.save(session.date)">OK</v-btn>
+              <v-date-picker v-model="session.date" no-title scrollable :allowed-dates="allowedDates" @change="$refs.menu.save(session.date)" required>
               </v-date-picker>
             </v-menu>
           </v-flex>
@@ -44,6 +43,7 @@
                   v-model="addedClient"
                   label="add client"
                   autocomplete
+                  @keyup.enter.native="addClient(addedClient)"
                 ></v-select>
                 <v-btn @click="addClient(addedClient)">add</v-btn>
               </v-flex>
@@ -56,7 +56,7 @@
             </v-layout>
           </v-container>
           <div class="error" v-html="error" />
-          <v-btn @click="create">Create</v-btn>
+          <v-btn @click="submit">Create</v-btn>
         </div>
       </div>
     </v-flex>
@@ -133,7 +133,15 @@ export default {
       }
       return false
     },
-    allowedDates: val => (new Date() >= new Date(val))
+    allowedDates: val => (new Date() >= new Date(val)),
+    submit () {
+      this.error = ''
+      if (this.session.date !== '' && this.clients.length > 0) {
+        this.create()
+      } else {
+        this.error = 'Interaction must have date and at least one attendee'
+      }
+    }
   },
   async mounted () {
     this.allClients = (await ClientService.index()).data

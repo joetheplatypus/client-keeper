@@ -33,6 +33,7 @@
                 :nudge-right="40"
                 min-width="290px"
                 :return-value.sync="dropin.date"
+                required
               >
                 <v-text-field
                   slot="activator"
@@ -40,11 +41,9 @@
                   v-model="dropin.date"
                   prepend-icon="event"
                   readonly
+                  required
                 ></v-text-field>
-                <v-date-picker v-model="dropin.date" no-title scrollable :allowed-dates="allowedDates">
-                  <v-spacer></v-spacer>
-                  <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
-                  <v-btn flat color="primary" @click="$refs.menu.save(dropin.date)">OK</v-btn>
+                <v-date-picker v-model="dropin.date" no-title scrollable :allowed-dates="allowedDates" @change="$refs.menu.save(dropin.date)" required>
                 </v-date-picker>
               </v-menu>
             </v-flex>
@@ -62,6 +61,7 @@
                   v-model="addedClient"
                   label="add client"
                   autocomplete
+                  @keyup.enter.native="addClient(addedClient)"
                 ></v-select>
                 <v-btn @click="addClient(addedClient)">add</v-btn>
               </v-flex>
@@ -74,7 +74,7 @@
             </v-layout>
           </v-container>
           <div class="error" v-html="error" />
-          <v-btn @click="save">Save</v-btn>
+          <v-btn @click="submit">Save</v-btn>
         </div>
       </div>
     </v-flex>
@@ -190,6 +190,14 @@ export default {
         this.$router.push({
           name: 'dropins'
         })
+      }
+    },
+    submit () {
+      this.error = ''
+      if (this.dropin.date !== '') {
+        this.save()
+      } else {
+        this.error = 'dropin must have a date'
       }
     }
   },
