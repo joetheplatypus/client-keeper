@@ -17,7 +17,6 @@ sequelize
 
 // adding all files in this directory as models
 const files = fs.readdirSync(__dirname).filter(function (file) { return file !== 'index.js' })
-console.log(files)
 
 files.forEach(function (file) {
   const _path = path.join(__dirname, file)

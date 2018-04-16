@@ -52,13 +52,27 @@
                   <p>Average interactions per client: {{filtered.interactions.interactionsperclient}}</p>
                 </v-flex>
               </v-layout>
-              <v-container>
-                <h1>Totals</h1>
-              </v-container>
-              <v-container>
-                <h2>Interactions: {{filtered.totalInteractions}}</h2>
-                <h2>Beneficiaries: {{filtered.totalClients.length}}</h2>
-              </v-container>
+              <v-layout row wrap>
+                <v-flex xs6>
+                  <v-container>
+                    <h1>Dropin Comparison</h1>
+                  </v-container>
+                  <v-container>
+                    <v-flex xs6 offset-xs3>
+                      <chart :chartData=filtered.chartData :options={}></chart>
+                    </v-flex>
+                  </v-container>
+                </v-flex>
+                <v-flex xs6>
+                  <v-container class="mt-5">
+                    <h1>Totals</h1>
+                  </v-container>
+                  <v-container>
+                    <h2 class="pb-1">Interactions: {{filtered.totalInteractions}}</h2>
+                    <h2 class="pb-1">Beneficiaries: {{filtered.totalClients.length}}</h2>
+                  </v-container>
+                </v-flex>
+              </v-layout>
             </v-container>
           </v-card>
         </v-flex>
@@ -73,8 +87,12 @@ import CounsellingService from '@/services/CounsellingService'
 // import ClientService from '@/services/ClientService'
 import InteractionService from '@/services/InteractionService'
 import dateformat from 'dateformat'
+import Chart from '@/components/Analytics/Chart'
 
 export default {
+  components: {
+    Chart
+  },
   data () {
     return {
       filtered: {
@@ -98,7 +116,8 @@ export default {
         },
         totalInteractions: 0,
         totalClients: 0,
-        month: ''
+        month: '',
+        chartData: {}
       },
       dropins: [],
       counselling: [],
@@ -131,13 +150,31 @@ export default {
         2028
       ],
       monthPicker: this.getMonth(new Date()),
-      yearPicker: parseInt(this.getYear(new Date()))
+      yearPicker: parseInt(this.getYear(new Date())),
+      dropinLabels: [
+        'Monday',
+        'Tuesday',
+        'Thursday',
+        'Friday',
+        'Sunday',
+        'Choir'
+      ]
     }
   },
   methods: {
     dateParse (date) {
       var newDate = new Date(date)
       newDate = dateformat(newDate, 'dddd, dS mmmm, yyyy')
+      return newDate
+    },
+    getHour (date) {
+      var newDate = new Date(date)
+      newDate = dateformat(newDate, 'HH')
+      return newDate
+    },
+    getDay (date) {
+      var newDate = new Date(date)
+      newDate = dateformat(newDate, 'dddd')
       return newDate
     },
     getMonth (date) {
@@ -188,25 +225,41 @@ export default {
       const dropinInfo = this.getInteractionInfo(this.filtered.dropins.sessions)
       this.filtered.dropins.interactions = dropinInfo.interactions
       this.filtered.dropins.clients = dropinInfo.clients
-      this.filtered.dropins.interactionsperclient = dropinInfo.interactionsperclient
+      this.filtered.dropins.interactionsperclient = dropinInfo.interactionsperclient.toFixed(2)
 
       // counselling
       const counsellingInfo = this.getInteractionInfo(this.filtered.counselling.sessions)
       this.filtered.counselling.interactions = counsellingInfo.interactions
       this.filtered.counselling.clients = counsellingInfo.clients
-      this.filtered.counselling.interactionsperclient = counsellingInfo.interactionsperclient
+      this.filtered.counselling.interactionsperclient = counsellingInfo.interactionsperclient.toFixed(2)
 
       // interactions
       const interactionInfo = this.getInteractionInfo(this.filtered.interactions.sessions)
       this.filtered.interactions.interactions = interactionInfo.interactions
       this.filtered.interactions.clients = interactionInfo.clients
-      this.filtered.interactions.interactionsperclient = interactionInfo.interactionsperclient
+      this.filtered.interactions.interactionsperclient = interactionInfo.interactionsperclient.toFixed(2)
 
       // totals
       const concatEvents = this.filtered.dropins.sessions.concat(this.filtered.counselling.sessions, this.filtered.interactions.sessions)
       const totalInfo = this.getInteractionInfo(concatEvents)
       this.filtered.totalInteractions = totalInfo.interactions
       this.filtered.totalClients = totalInfo.clients
+
+      // chart
+      let tempData = [0, 0, 0, 0, 0, 0]
+      for (var l = 0; l < this.dropinLabels.length; l++) {
+        for (var m = 0; m < this.filtered.dropins.sessions.length; m++) {
+          if (this.getDay(this.filtered.dropins.sessions[m].date) === this.dropinLabels[l]) {
+            if (parseInt(this.getHour(this.filtered.dropins.sessions[m].date)) === 1) {
+              tempData[l] += this.filtered.dropins.sessions[m].attendees.length
+            } else {
+              tempData[5] += this.filtered.dropins.sessions[m].attendees.length
+            }
+          }
+        }
+      }
+      console.log(tempData)
+      this.updateChart(tempData)
     },
     getInteractionInfo (events) {
       let eventInteractions = 0
@@ -229,6 +282,40 @@ export default {
         interactions: eventInteractions,
         clients: eventClients,
         interactionsperclient: interactionsperclient
+      }
+    },
+    updateChart (data) {
+      let dataWithColours = []
+      for (var n = 0; n < data.length; n++) {
+        dataWithColours.push({
+          value: data[n],
+          color: 'blue'
+        })
+      }
+      console.log(dataWithColours)
+      this.filtered.chartData = {
+        labels: [
+          'Monday',
+          'Tuesday',
+          'Thursday',
+          'Friday',
+          'Sunday',
+          'Choir'
+        ],
+        datasets: [
+          {
+            backgroundColor: [
+              'red',
+              'blue',
+              'green',
+              'orange',
+              'purple',
+              'teal'
+            ],
+            label: 'Dropin Comparison',
+            data: data
+          }
+        ]
       }
     }
   },
